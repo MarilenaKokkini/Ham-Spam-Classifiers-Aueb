@@ -239,21 +239,21 @@ public class Driver {
                 double devAcc=0.0;
                 int featuresLogReg=0; // beginning with 0 features.
                 ArrayList<Feature> featuresLogRegList;
-                double bestLambda =.0;
-                double bestLearningRate =.0;
+                double bestLambda = 0.01;
+                double bestLearningRate = 0.01;
 
                 for(int i=0; i<possibleFeatNum.length; i++)
                 {
                     featuresLogRegList = new ArrayList<>(features.subList(0,possibleFeatNum[i]));
 
                     double lambda = 0.01;
-                    while(lambda >= .0001)
+                    while(lambda >= 0.0001)
                     {
                         double learningRate = 0.01;
-                        while(learningRate>= .0001)
+                        while(learningRate>= 0.0001)
                         {
                             LogisticRegression logReg = new LogisticRegression(DataHandling.getTrainingData(),featuresLogRegList,5,learningRate,lambda);
-                            logReg.train();
+                            logReg.train(); // learning w.
                             int rightAnswers =0;
                             for(eMail mail : DataHandling.getDevelopmentData())
                             {
