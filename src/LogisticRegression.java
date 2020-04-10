@@ -17,26 +17,9 @@ public class LogisticRegression
     {
         this.features = new ArrayList<>(features);
         this.trainingData = new ArrayList<>(trainingData);
-        this.w = new double[features.size()];
+        this.w = new double[features.size()+1]; //with bias.
         this.learningRate = learningRate;
         this.lambda = lambda;
-        this.epochs=epochs;
-        this.featureVectors=new ArrayList<>();
-        for(eMail m : this.trainingData)
-        {
-            int[] tmp = this.createFeatureVector(m);
-            this.featureVectors.add(tmp);
-        }
-
-    }
-
-    LogisticRegression(ArrayList<eMail> trainingData,ArrayList<Feature> features,int epochs)
-    {
-        this.features = new ArrayList<>(features);
-        this.trainingData = new ArrayList<>(trainingData);
-        this.w = new double[features.size()];
-        this.learningRate = 0.1;
-        this.lambda = 0.1;
         this.epochs=epochs;
         this.featureVectors=new ArrayList<>();
         for(eMail m : this.trainingData)
@@ -98,9 +81,9 @@ public class LogisticRegression
 
         for(int i=0; i<this.epochs; i++)
         {
-            double s = .0; // log likelihood. We want to maximize that.
+            double s = .0; // log likelihood. We want to maximize this.
             double lw;
-            for(int j=0; j<this.trainingData.size(); j++)
+            for(int j=0; j<this.trainingData.size(); j++) //for every training example.
             {
                 int yi;
                 int[] x = this.featureVectors.get(j); // feature vector with bias.
