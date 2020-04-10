@@ -252,7 +252,7 @@ public class Driver {
                         double learningRate = 0.01;
                         while(learningRate>= 0.0001)
                         {
-                            LogisticRegression logReg = new LogisticRegression(DataHandling.getTrainingData(),featuresLogRegList,5,learningRate,lambda);
+                            LogisticRegression logReg = new LogisticRegression(DataHandling.getTrainingData(),featuresLogRegList,20,learningRate,lambda);
                             logReg.train(); // learning w.
                             int rightAnswers =0;
                             for(eMail mail : DataHandling.getDevelopmentData())
@@ -280,7 +280,7 @@ public class Driver {
                 System.out.println("Accuracy dev data is:" + devAcc);
 
                 featuresLogRegList = new ArrayList<>(features.subList(0,featuresLogReg));
-                LogisticRegression classification = new LogisticRegression(DataHandling.getTrainingData(),featuresLogRegList,5,bestLearningRate,bestLambda);
+                LogisticRegression classification = new LogisticRegression(DataHandling.getTrainingData(),featuresLogRegList,20,bestLearningRate,bestLambda);
                 classification.train();
 
                 calculate100Percent(classification);
@@ -288,7 +288,7 @@ public class Driver {
                 print();
             }
 
-            System.out.println("If you want to quit, press 0. Otherwise select another algorithm. (1,2 or 3) ");
+            System.out.println("If you want to quit, press 0. Otherwise select another algorithm. (1,2,3 or 4) ");
             System.out.print("Selection: ");
             input=scanner.nextInt();
         }
