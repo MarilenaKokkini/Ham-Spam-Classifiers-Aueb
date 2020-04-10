@@ -1,14 +1,11 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
 
 public class LogisticRegression
 {
     private ArrayList<Feature> features; //features (words)
     private ArrayList<eMail> trainingData; //training mails
-    private ArrayList<int[]> featureVectors; // training mails as vectors.
-    private double[] w; //weights.
+    private List<List<Integer>> featureVectors; // training mails as vectors.
+    private List<Double> w; //weights.
     private double learningRate; // learning rate.
     private double lambda; // regularization term.
     private int epochs; // iterations.
@@ -17,16 +14,17 @@ public class LogisticRegression
     {
         this.features = new ArrayList<>(features);
         this.trainingData = new ArrayList<>(trainingData);
-        this.w = new double[features.size()+1]; //with bias.
+        this.w = new ArrayList<>();
         this.learningRate = learningRate;
         this.lambda = lambda;
         this.epochs=epochs;
         this.featureVectors=new ArrayList<>();
         for(eMail m : this.trainingData)
         {
-            int[] tmp = this.createFeatureVector(m);
+            List<Integer> tmp = this.createFeatureVector(m);
             this.featureVectors.add(tmp);
         }
+        //System.out.println("features are: " + this.features.size() + " and columns of X are: " + this.featureVectors.get(0).size());
 
     }
 
@@ -36,12 +34,12 @@ public class LogisticRegression
      * @param x is the array of a mail.
      * @return probability of being spam or ham.
      */
-    private double sigmoid(double[] w, int[] x)
+    private double sigmoid(List<Double> w, List<Integer> x)
     {
         double res=0.0;
-        for(int i=0; i<w.length; i++)
+        for(int i=0; i<w.size(); i++)
         {
-            res = res + w[i]*x[i];
+            res = res + w.get(i)*x.get(i);
         }
         return 1.0 / ( 1.0 + Math.exp(-res) );
     }
@@ -51,19 +49,20 @@ public class LogisticRegression
      * @param mail is the mail to be converted.
      * @return feature vector as int array.
      */
-    private int[] createFeatureVector(eMail mail)
+    private List<Integer> createFeatureVector(eMail mail)
     {
-        int[] featVec = new int[this.features.size()+1]; // extra column for bias.
+        //int[] featVec = new int[this.features.size()+1]; // extra column for bias.
+        List<Integer> featVec = new ArrayList<>();
         String content = mail.getContent().toUpperCase().substring(9);
         HashSet<String> tokens = new HashSet<String>(Arrays.asList(content.split("\\s+")));
 
         for(int i=0; i<this.features.size(); i++)
         {
-            if(tokens.contains(this.features.get(i).getFeatureName())) featVec[i]=1;
-            else featVec[i]=0;
+            if(tokens.contains(this.features.get(i).getFeatureName())) featVec.add(1);
+            else featVec.add(0);
         }
 
-        featVec[featVec.length-1]=1; //bias.
+        featVec.add(0,1); // extra column in the beginning for bias.
         return featVec;
     }
 
@@ -74,9 +73,9 @@ public class LogisticRegression
     public void train()
     {
         Random r = new Random();
-        for(int i=0; i<this.w.length; i++)
+        for(int i=0; i<this.featureVectors.get(0).size(); i++) // dimensions: columns of X array.
         {
-            this.w[i] = r.nextDouble(); //begin with random weights.
+            this.w.add(r.nextDouble()); //begin with random weights.
         }
 
         for(int i=0; i<this.epochs; i++)
@@ -86,7 +85,7 @@ public class LogisticRegression
             for(int j=0; j<this.trainingData.size(); j++) //for every training example.
             {
                 int yi;
-                int[] x = this.featureVectors.get(j); // feature vector with bias.
+                List<Integer> x = this.featureVectors.get(j); // feature vector with bias.
                 if(this.trainingData.get(j).isSpam())
                 {
                     yi=1;
@@ -100,13 +99,13 @@ public class LogisticRegression
                 double norm =.0;
                 for(double w : this.w)
                 {
-                    norm = norm + Math.pow(w,2);
+                    norm = norm + w*w;
                 }
                 s = s + lw - this.lambda * norm; // regularized.
                 double tmp = yi - this.sigmoid(w,x);
-                for(int l=0; l<this.w.length; l++)
+                for(int l=0; l<this.w.size(); l++)
                 {
-                    this.w[l] = this.w[l] + this.learningRate * tmp * x[l]; //updating the weights.
+                    this.w.set(l , this.w.get(l) + this.learningRate * tmp * x.get(l));//updating the weights.
                 }
             }
             System.out.println("epoch: " + i + " likelihood: " + s);
@@ -122,10 +121,12 @@ public class LogisticRegression
      */
     public boolean classifyMail(eMail mail)
     {
-        int[] x = this.createFeatureVector(mail); // feature vector with bias.
+        List<Integer> x = this.createFeatureVector(mail); // feature vector with bias.
         double decision = this.sigmoid(this.w,x);
         return decision >= 0.5;
     }
+
+
 
 
 
