@@ -6,7 +6,7 @@ import java.util.*;
 public class AdaBoost {
 
     private int M; // number of iterations.
-    // week learner.
+    // weak learner.
     private double[] w; //vector of weights for the training mails. --> initially, all 1/trainingData.size()
     private DecisionStump[] h; //vector of hypotheses.
     private ArrayList<eMail> trainingData; // the training mails.
