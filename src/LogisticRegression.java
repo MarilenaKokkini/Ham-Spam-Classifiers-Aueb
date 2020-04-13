@@ -1,5 +1,4 @@
 import java.util.*;
-
 public class LogisticRegression
 {
     private ArrayList<Feature> features; //features (words)
@@ -54,11 +53,10 @@ public class LogisticRegression
         //int[] featVec = new int[this.features.size()+1]; // extra column for bias.
         List<Integer> featVec = new ArrayList<>();
         String content = mail.getContent().toUpperCase().substring(9);
-        HashSet<String> tokens = new HashSet<String>(Arrays.asList(content.split("\\s+")));
+        HashSet<String> tokens = new HashSet<>(Arrays.asList(content.split("\\s+")));
 
-        for(int i=0; i<this.features.size(); i++)
-        {
-            if(tokens.contains(this.features.get(i).getFeatureName())) featVec.add(1);
+        for (Feature feature : this.features) {
+            if (tokens.contains(feature.getFeatureName())) featVec.add(1);
             else featVec.add(0);
         }
 
@@ -68,7 +66,7 @@ public class LogisticRegression
 
     /**
      * training of the algorithm.
-     * Stochastic Gradient Ascent.
+     * Stochastic Gradient Ascent with regularization term.
      */
     public void train()
     {
@@ -102,13 +100,13 @@ public class LogisticRegression
                     norm = norm + w*w;
                 }
                 s = s + lw - this.lambda * norm; // regularized.
-                double tmp = yi - this.sigmoid(w,x);
+                double tmp = yi - this.sigmoid(this.w,x);
                 for(int l=0; l<this.w.size(); l++)
                 {
-                    this.w.set(l , this.w.get(l) + this.learningRate * tmp * x.get(l));//updating the weights.
+                    this.w.set(l , this.w.get(l) + this.learningRate * tmp * x.get(l));//updating the weights with the derivative.
                 }
             }
-            System.out.println("epoch: " + i + " likelihood: " + s);
+            //System.out.println("epoch: " + i + " likelihood: " + s);
 
         }
 
@@ -125,9 +123,5 @@ public class LogisticRegression
         double decision = this.sigmoid(this.w,x);
         return decision >= 0.5;
     }
-
-
-
-
 
 }
