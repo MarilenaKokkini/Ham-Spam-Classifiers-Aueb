@@ -100,7 +100,7 @@ public class Driver {
                 /**
                  *  train Naive-Bayes with the found number of features.
                  */
-                featuresBayesList= new ArrayList<Feature>(features.subList(0,featuresBayes));
+                featuresBayesList= new ArrayList<>(features.subList(0,featuresBayes));
                 NaiveBayes classification = new NaiveBayes(featuresBayesList);
                 classification.train();
 
@@ -231,17 +231,19 @@ public class Driver {
 
             }
             /**
-             * LOGISTIC
+             * LOGISTIC REGRESSION DEMO
+             * PERFORMING EARLY STOPPING
              */
             else if(input==4)
             {
-                System.out.println("Finding best features number and hyper-parameters for logistic regression.");
+                System.out.println("Finding best features number and hyper-parameters for logistic regression. Will perform early stopping.");
                 double devAcc=0.0;
                 int featuresLogReg=0; // beginning with 0 features.
                 ArrayList<Feature> featuresLogRegList;
                 double bestLambda = 0.01;
                 double bestLearningRate = 0.01;
-
+                int bestEpochs=0;
+                int n = 0; // when to stop. (->7)
                 for(int i=0; i<possibleFeatNum.length; i++)
                 {
                     featuresLogRegList = new ArrayList<>(features.subList(0,possibleFeatNum[i]));
@@ -252,35 +254,50 @@ public class Driver {
                         double learningRate = 0.01;
                         while(learningRate>= 0.0001)
                         {
-                            LogisticRegression logReg = new LogisticRegression(DataHandling.getTrainingData(),featuresLogRegList,20,learningRate,lambda);
-                            logReg.train(); // learning w.
-                            int rightAnswers =0;
-                            for(eMail mail : DataHandling.getDevelopmentData())
+                            for(int e=1; e<Integer.MAX_VALUE; e++)
                             {
-                                boolean answer = logReg.classifyMail(mail);
-                                if(answer==mail.isSpam()) rightAnswers++;
+                                System.out.println("Checking with "  + e + " epochs, " + lambda + " as reg term, " + learningRate + " as learning rate and with num. of features: " + possibleFeatNum[i]);
+                                LogisticRegression logReg = new LogisticRegression(DataHandling.getTrainingData(),featuresLogRegList,e,learningRate,lambda);
+                                logReg.train(); // learning w.
+                                int rightAnswers =0;
+                                for(eMail mail : DataHandling.getDevelopmentData())
+                                {
+                                    boolean answer = logReg.classifyMail(mail);
+                                    if(answer==mail.isSpam()) rightAnswers++;
+                                }
+                                double devAcc_curr = rightAnswers / (DataHandling.getDevelopmentData().size() * 1.0); // calculating the current accuracy for dev data.
+                                if (devAcc_curr > devAcc) {
+                                    devAcc = devAcc_curr;
+                                    featuresLogReg = possibleFeatNum[i];
+                                    bestLambda=lambda;
+                                    bestLearningRate=learningRate;
+                                    bestEpochs=e;
+                                    n=0;
+                                    System.out.println("Reset n...");
+                                }
+                                else
+                                {
+                                    n++; System.out.println("n is: " + n);
+                                    if(n==7){ System.out.println("Best number of epochs so far: " + bestEpochs); n=0; break;} // found best epochs! Early stopping here.
+                                }
+
+                                //if(e%10==0) System.out.print(".");
                             }
-                            double devAcc_curr = rightAnswers / (DataHandling.getDevelopmentData().size() * 1.0); // calculating the current accuracy for dev data.
-                            if (devAcc_curr > devAcc) {
-                                devAcc = devAcc_curr;
-                                featuresLogReg = possibleFeatNum[i];
-                                bestLambda=lambda;
-                                bestLearningRate=learningRate;
-                            }
+
                             learningRate = learningRate * 0.1;
                         }
                         lambda = lambda * 0.1;
                     }
-                    //if(i%20==0) System.out.print(".");
                 }
                 System.out.println();
                 System.out.println("Best features number for Logistic Regression are: " + featuresLogReg);
                 System.out.println("Best number for lambda is: " + bestLambda);
                 System.out.println("Best number for learning rate is: " + bestLearningRate);
+                System.out.println("Best number for epochs is: " + bestEpochs);
                 System.out.println("Accuracy dev data is:" + devAcc);
 
                 featuresLogRegList = new ArrayList<>(features.subList(0,featuresLogReg));
-                LogisticRegression classification = new LogisticRegression(DataHandling.getTrainingData(),featuresLogRegList,20,bestLearningRate,bestLambda);
+                LogisticRegression classification = new LogisticRegression(DataHandling.getTrainingData(),featuresLogRegList,bestEpochs,bestLearningRate,bestLambda);
                 classification.train();
 
                 calculate100Percent(classification);
