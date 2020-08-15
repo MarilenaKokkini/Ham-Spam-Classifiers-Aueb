@@ -1,4 +1,4 @@
-# HamSpamClassifiers
+# ham-spam-classifiers
 Implemented 4 ML classification algorithms(Naive Bayes,ID3,AdaBoost,Logistic Regression) from scratch in pure Java. Project for AI course.
 
 Distributed data in training(80%),development(10%) and testing(10%).
