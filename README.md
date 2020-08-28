@@ -6,7 +6,7 @@ Implemented 4 ML classification algorithms(Naive Bayes,ID3,AdaBoost,Logistic Reg
 
 Distributed data in training(80%),development(10%) and testing(10%).
 
-Calculated the information gain for all features(here being tokens from the mails) in order to specify m-best features and then used these features in each algorithm(creating the word embeddings if needed).
+Performed dimensionality reduction by calculating the information gain of all features(here being tokens from the mails) in order to specify m-best features and then used these features in each algorithm(creating the word embeddings if needed).
 
 Calculated best features number and hyper-parameters(if needed) for each algorithm based on accuracy accomplished in the development data.
 
