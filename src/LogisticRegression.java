@@ -103,7 +103,7 @@ public class LogisticRegression
                 double tmp = yi - this.sigmoid(this.w,x);
                 for(int l=0; l<this.w.size(); l++)
                 {
-                    this.w.set(l , this.w.get(l) + this.learningRate * tmp * x.get(l));//updating the weights with the derivative.
+                    this.w.set(l , (1-2*this.lambda*this.learningRate)*this.w.get(l) + this.learningRate * tmp * x.get(l));//updating the weights with the derivative.
                 }
             }
             //System.out.println("epoch: " + i + " likelihood: " + s);
